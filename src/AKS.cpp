@@ -1,142 +1,82 @@
+/*
+ * AKS.cpp
+ *
+ *  Created on: Jun 13, 2017
+ *      Author: tasos
+ */
+
 #include "AKS.h"
 
-//bool AKS::isPerfectPower()
-//{
-//	NTL::ZZ a, x;
-//
-//	for (NTL::ZZ i(2); i < log2(number); i++)
-//	{
-//		NTL::PrimeSeq p;
-//		long j = p.next();
-//		while(j < log2(number))
-//		{
-//			std::cout << "i = " << i << " and j = " << j << std::endl;
-//			if (NTL::power(i, j) == number)
-//				return true;
-//			j = p.next();
-//		}
-//	}
-//	return false;
-//}
+using namespace NTL;
 
 AKS::AKS(NTL::ZZ number)
 {
-    this->number = number;
+	this->number = number;
 }
 
-bool AKS::AlgorithmX()
+bool AKS::AKSAlgorithm()
 {
-    NTL::ZZ f, nroot_b;
-    NTL::RR y;
-
-    f = NTL::conv<NTL::ZZ>(NTL::floor(NTL::RR(log2(2 * number))));
-    nroot_b = NTL::conv<NTL::ZZ>(3 + NTL::ceil(NTL::conv<NTL::RR>(f) / 2));
-
-    if (nroot_b <= NTL::CeilToZZ(NTL::conv<NTL::RR>(log2(NTL::ZZ(8)))))
-        y = AlgorithmB(nroot_b, NTL::conv<NTL::RR>(number), NTL::ZZ(1));
-    else
-        y = AlgorithmN(nroot_b, NTL::conv<NTL::RR>(number), NTL::ZZ(1));
-
-    NTL::PrimeSeq p;
-    long i = p.next();
-    while(i < f)
-    {
-    	NTL::RR x = AlgorithmK(number, NTL::conv<NTL::ZZ>(i), y);
-    	if (x > 0)
-    		return true;
-    	i = p.next();
-    }
-    return false;
-}
-
-NTL::RR AKS::AlgorithmB(NTL::ZZ b, NTL::RR y, NTL::ZZ k)
-{
-	long g = 0;
-	long gn = -1;
-	while(true)
+	PerfectPower pp;
+	if (pp.AlgorithmX(number))
 	{
-		if (NTL::conv<NTL::RR>(NTL::power(NTL::RR(2), g - 1)) < y && NTL::conv<NTL::RR>(NTL::power(NTL::RR(2), g)) >= y)
-			break;
-		if (NTL::conv<NTL::RR>(NTL::power(NTL::RR(2), gn - 1)) < y && NTL::conv<NTL::RR>(NTL::power(NTL::RR(2), gn)) >= y)
+		std::cout << "The number is perfect power. Hence, composite!" << std::endl;
+		return false;
+	}
+	else
+	{
+		std::cout << "The number is not perfect power. Checking for primality!" << std::endl;
+	}
+
+	NTL::PrimeSeq p;
+	int r = 2;
+	long j = p.next();
+	while (r < number)
+	{
+		if (NTL::GCD(number, conv<ZZ>(r)) != 1)
+			return false;
+		if (r == j)
 		{
-			g = gn;
-			break;
+			LPF lpf(r - 1);
+			long q = lpf.largest_prime_factor();
+			std::cout << "r = " << r << " and q = " << q << std::endl;
+			std::cout << "The combination = " << lpf.combination(2 * q - 1, q) << std::endl;
+			std::cout << " sqrt(r) = " << std::sqrt(r) << std::endl;
+			std::cout << " sqrt(r) * log2(n) = " << std::sqrt(r) * pp.log2(number) << std::endl;
+			std::cout << " Floor = " << NTL::floor(NTL::conv<NTL::RR>(std::sqrt(r) * pp.log2(number))) << std::endl;
+			std::cout << " 2^(2*sqrt(r)log(n) = " << NTL::power(NTL::ZZ(2), NTL::conv<long>(2 * NTL::floor(NTL::conv<NTL::RR>(std::sqrt(r) * pp.log2(number))))) << std::endl;
+			std::cout << " n^((r - 1) / q) mod r == 0, 1 is " << NTL::power(number, (r-1) / q) % r << std::endl;
+			if (lpf.combination(2 * q - 1, q) >= NTL::power(NTL::ZZ(2), NTL::conv<long>(2 * NTL::floor(NTL::conv<NTL::RR>(std::sqrt(r)) * pp.log2(number)))) && NTL::power(number, (r-1) / q) % r > 1)
+				break;
+			j = p.next();
 		}
-		g++;
-		gn--;
+
+		r++;
 	}
-	NTL::ZZ b_capital = NTL::conv<NTL::ZZ>(NTL::ceil(NTL::conv<NTL::RR>(log2(66 * (2 * k + 1)))));
-	NTL::ZZ a = NTL::conv<NTL::ZZ>(NTL::floor(NTL::conv<NTL::RR>(NTL::ZZ(-g) / k)));
 
-	NTL::RR z = NTL::conv<NTL::RR>(NTL::power(NTL::RR(2), NTL::conv<long>(a)) + NTL::power(NTL::RR(2), NTL::conv<long>(a - 1)));
-	NTL::ZZ j(1);
+	std::cout << "r = " << r <<std::endl;
 
-	do {
-		if (j == b)
-			return z;
-		NTL::RR r = NTL::power(z, NTL::conv<long>(k)) * NTL::conv<NTL::RR>(y);
-
-		if (r <= 0.9697265625)
-			z = z + NTL::power(NTL::RR(2), NTL::conv<long>(a-j-1));
-		if (r > 1)
-			z = z - NTL::power(NTL::RR(2), NTL::conv<long>(a-j-1));
-		j++;
-	} while (true);
-}
-
-//NTL::RR AKS::AlgorithmP(NTL::RR r, NTL::ZZ k, NTL::ZZ b)
-//{
-//	if (k == 1)
-//		return NTL::TruncPrec(r, NTL::conv<long>(b));
-//	if (k % 2 == 0)
-//	{
-//		return NTL::TruncPrec(AKS::AlgorithmP(r, k/2, b) ^ 2, NTL::conv<long>(b));
-//	}
-//}
-
-NTL::RR AKS::AlgorithmN(NTL::ZZ b, NTL::RR y, NTL::ZZ k)
-{
-	NTL::ZZ b_prime = NTL::CeilToZZ(NTL::RR(log2(2 * k))) + NTL::CeilToZZ(NTL::conv<NTL::RR>(b - (NTL::CeilToZZ(NTL::RR(log2(2 * k))))) / 2);
-	NTL::ZZ b_capital = 2 * b_prime + 4 - NTL::CeilToZZ(NTL::RR(log2(k)));
-
-	NTL::RR z;
-
-	if (b_prime <= NTL::CeilToZZ(NTL::RR(log2(8 * k))))
-		z = AKS::AlgorithmB(b_prime, y, k);
-	else
-		z = AKS::AlgorithmN(b_prime, y, k);
-
-	NTL::RR r2 = z * NTL::conv<NTL::RR>(k + 1);
-	NTL::RR r3 = NTL::power(z, NTL::conv<long>(k + 1)) * y;
-	NTL::RR r4 = (r2 - r3) / NTL::conv<NTL::RR>(k);
-
-	return r4;
-}
-
-NTL::RR AKS::AlgorithmK(NTL::ZZ number, NTL::ZZ k, NTL::RR y)
-{
-	NTL::ZZ f = NTL::conv<NTL::ZZ>(NTL::floor(NTL::RR(log2(2 * number))));
-	NTL::ZZ b = 3 + NTL::conv<NTL::ZZ>(NTL::ceil(NTL::conv<NTL::RR>(f) / NTL::conv<NTL::RR>(k)));
-
-	NTL::RR r;
-
-	if (b <= NTL::CeilToZZ(NTL::conv<NTL::RR>(log2(8 * k))))
-		r = AKS::AlgorithmB(b, y, k);
-	else
-		r = AKS::AlgorithmN(b, y, k);
-
-	NTL::RR x(0);
-	while(true)
+	int temp = NTL::conv<int>(NTL::floor(NTL::RR(r-1) * pp.log2(number)));
+	for (int a = 1; a <= temp; a++)
 	{
-		if (NTL::abs(r - x) <= NTL::RR(0.625))
-			break;
-		x++;
+		if (!congruence(a, r))
+			return false;
 	}
+	return true;
+}
 
-	if (x == 0.0 || NTL::abs(r - x) >= NTL::RR(0.25))
-		return NTL::RR(0);
+bool AKS::congruence(int a, long r)
+{
+	NTL::ZZ_p::init(number);
+	NTL::ZZ_pX f(r, 1);
+	f = f - 1;
+	const ZZ_pXModulus pf(f);
+	ZZ_pX rhs(number % r, 1);
 
-	if (NTL::conv<NTL::RR>(number) == NTL::power(x, NTL::conv<long>(k)))
-		return x;
-	return NTL::RR(0);
+	ZZ_pX lhs(1,1);
+	lhs += a;
+	NTL::PowerMod(lhs, lhs, number, pf);
+	lhs -= a;
+	if (lhs != rhs)
+		return false;
+	return true;
 }
