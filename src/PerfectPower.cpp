@@ -2,12 +2,17 @@
 
 using namespace NTL;
 
+PerfectPower::PerfectPower()
+{
+	tools = Utilities();
+}
+
 bool PerfectPower::AlgorithmX(ZZ number)
 {
     int f, nroot_b;
     double y;
 
-    f = floor(log2(2 * number));
+    f = floor(tools.log2(2 * number));
     nroot_b = 3 + ceil(f / 2);
 
     if (nroot_b <= ceil(log2(8)))
@@ -82,7 +87,7 @@ double PerfectPower::AlgorithmN(int b, RR y, int k)
 
 RR PerfectPower::AlgorithmK(ZZ number, long k, RR y)
 {
-	int f = floor(log2(2 * number));
+	int f = floor(tools.log2(2 * number));
 	int b = 3 + ceil(f / k);
 
 	RR r;
