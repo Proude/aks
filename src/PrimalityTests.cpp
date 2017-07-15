@@ -50,18 +50,19 @@ void PrimalityTests::CheckPrimeNumbers()
 
 void PrimalityTests::returnTrueIfTheNumberIsPrime()
 {
-	std::string str("6075380529345458860144577398704761614649");
+	std::string str("2425967623052370772757633156976982469681");
 	NTL::ZZ number(NTL::INIT_VAL, str.c_str());
 	AKS aks(number);
-	clock_t begin = clock();
-//	bool aksv3 = aks.AKSAlgorithm();
-	clock_t end = clock();
-	std::cout << (double)(end - begin) / CLOCKS_PER_SEC << std::endl;
-	begin = clock();
-	bool aksBern = aks.AKSAlgorithm_Bernstein();
-	end = clock();
-	std::cout << (double)(end - begin) / CLOCKS_PER_SEC << std::endl;
-//	CPPUNIT_ASSERT(aksv3);
+	struct timeval start, end;
+	gettimeofday(&start, NULL);
+	bool aksv3 = aks.AKSAlgorithm_Bernstein();
+	gettimeofday(&end, NULL);
+	std::cout << ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6 << std::endl;
+	gettimeofday(&start, NULL);
+	bool aksBern = aks.AKSAlgorithm_Bernstein_OMP();
+	gettimeofday(&end, NULL);
+	std::cout << ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6 << std::endl;
+	CPPUNIT_ASSERT(aksv3);
 	CPPUNIT_ASSERT(aksBern);
 //	CPPUNIT_ASSERT(aksv3 == aksBern);
 }

@@ -6,7 +6,6 @@
 CPP_SRCS += \
 ../src/AKS.cpp \
 ../src/AKSTests.cpp \
-../src/Congruence.cpp \
 ../src/LPF.cpp \
 ../src/LPFTests.cpp \
 ../src/PerfectPower.cpp \
@@ -19,7 +18,6 @@ CPP_SRCS += \
 OBJS += \
 ./src/AKS.o \
 ./src/AKSTests.o \
-./src/Congruence.o \
 ./src/LPF.o \
 ./src/LPFTests.o \
 ./src/PerfectPower.o \
@@ -32,7 +30,6 @@ OBJS += \
 CPP_DEPS += \
 ./src/AKS.d \
 ./src/AKSTests.d \
-./src/Congruence.d \
 ./src/LPF.d \
 ./src/LPFTests.d \
 ./src/PerfectPower.d \
@@ -47,7 +44,7 @@ CPP_DEPS += \
 src/%.o: ../src/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	g++ -std=c++0x -I/usr/include/NTL -I/usr/lib/gcc/x86_64-linux-gnu/5.4.1/include -I/usr/include/cppunit -I/usr/local/include -O3 -g3 -Wall -fopenmp -c -fmessage-length=0 -pthread -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
+	g++ -std=c++0x -I/usr/ocal/include/NTL -I/usr/lib/gcc/x86_64-linux-gnu/5.4.1/include -I/usr/include/cppunit -I/usr/local/include -O3 -g3 -Wall -fopenmp -c -fmessage-length=0 -pthread -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

@@ -22,6 +22,7 @@ bool AKS::AKSAlgorithm()
 		return false;
 
 	int r = findRMultiplicativeOrder();
+	std::cout << r << std::endl;
 
 	for (NTL::ZZ i(2); i < number; i++)
 		if (NTL::GCD(i, number) != 1)
@@ -45,11 +46,172 @@ bool AKS::AKSAlgorithm()
 	return true;
 }
 
+bool AKS::AKSAlgorithm_Bernstein()
+{
+	struct timeval start, end;
+	gettimeofday(&start, NULL);
+	if (pp.AlgorithmX(number))
+	{
+		gettimeofday(&end, NULL);
+		std::cout << "Elapsed time (perfect power) = " << ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6 << std::endl;
+		return false;
+	}
+	gettimeofday(&end, NULL);
+	std::cout << "Elapsed time (perfect power) = " << ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6 << std::endl;
+
+	//long r = findRMultiplicativeOrder();
+	gettimeofday(&start, NULL);
+	int r = primitiveModulo();
+	gettimeofday(&end, NULL);
+	std::cout << "Elapsed time (find r) = " << ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6 << std::endl;
+//	std::ofstream file;
+//	file.open("test.txt",std::ios::app);
+//	file << "The primitive root modulo of " << number << " is " << r << std::endl;
+//	file.close();
+//	std::cout << "r_temp = " << r_temp << std::endl;
+//	r = r_temp;
+	int phiR = phi(NTL::ZZ(r));
+	const double d = 0.5 * phiR;
+	const double i = 0.475 * phiR;
+	const double j = 0.475 * phiR;
+	//long s = findS(r, d, i, j);
+	gettimeofday(&start, NULL);
+	long s = findSB(r, d, i, j);
+	gettimeofday(&end, NULL);
+	std::cout << "Elapsed time (find s) = " << ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6 << std::endl;
+	gettimeofday(&start, NULL);
+	for (NTL::ZZ i(2); i <= s + 1; i++)
+	{
+		if ((i % number != 0) && (NTL::PowerMod(i % number, number - 1, number) != 1))
+			return false;
+//		if ((i != number) && NTL::GCD(number, i) != 1)
+//			return false;
+		for (NTL::ZZ j(2); j <= s + 1; j++)
+		{
+			if ((i * j > 1) && ((i * j) - 1 != number) && (i * j - 1 < number) && (NTL::GCD(number, (i * j) - 1) != 1))
+				return false;
+			if ((i - j > 0) && (i-j != number) && (i-j < number) && (NTL::GCD(number, i - j) != 1))
+				return false;
+		}
+	}
+	gettimeofday(&end, NULL);
+	std::cout << "Elapsed time (gcd) = " << ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6 << std::endl;
+
+	NTL::ZZ_p::init(number);
+	NTL::ZZ_pX f(r, 1);
+	f = f - 1;
+	const NTL::ZZ_pXModulus pf(f);
+	NTL::ZZ_pX rhs(number % r, 1);
+	NTL::ZZ_pX lhs(1,1);
+	gettimeofday(&start, NULL);
+	for (int a = 1; a <= s + 1; a++)
+	{
+		if (!congruence(a, rhs, lhs, pf))
+			return false;
+	}
+	gettimeofday(&end, NULL);
+	std::cout << "Elapsed time (congruence) = " << ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6 << std::endl;
+	return true;
+}
+
+bool AKS::AKSAlgorithm_Bernstein_OMP()
+{
+	struct timeval start, end;
+	gettimeofday(&start, NULL);
+	if (pp.AlgorithmX(number))
+	{
+		gettimeofday(&end, NULL);
+		std::cout << "Elapsed time (perfect power) = " << ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6 << std::endl;
+		return false;
+	}
+	gettimeofday(&end, NULL);
+	std::cout << "Elapsed time (perfect power) = " << ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6 << std::endl;
+	//long r = findRMultiplicativeOrder();
+	gettimeofday(&start, NULL);
+	int r = primitiveModulo();
+	gettimeofday(&end, NULL);
+	std::cout << "Elapsed time (find r) = " << ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6 << std::endl;
+//	std::ofstream file;
+//	file.open("test.txt",std::ios::app);
+//	file << "The primitive root modulo of " << number << " is " << r << std::endl;
+//	file.close();
+//	std::cout << "r_temp = " << r_temp << std::endl;
+//	r = r_temp;
+	int phiR = phi(NTL::ZZ(r));
+	const double d = 0.5 * phiR;
+	const double i = 0.475 * phiR;
+	const double j = 0.475 * phiR;
+	//long s = findS(r, d, i, j);
+	gettimeofday(&start, NULL);
+	long s = findSB(r, d, i, j);
+	gettimeofday(&end, NULL);
+	std::cout << "Elapsed time (find s) = " << ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6 << std::endl;
+	bool result = true;
+	gettimeofday(&start, NULL);
+	#pragma omp parallel for reduction(&:result)
+	for (int i = 2; i <= s + 1; i++)
+	{
+		NTL::ZZ iZZ(i);
+		if ((iZZ % number != 0) && (NTL::PowerMod(iZZ % number, number - 1, number) != 1))
+			result &= false;
+//		if ((i != number) && NTL::GCD(number, i) != 1)
+//			return false;
+		for (int j = 2; j <= s + 1; j++)
+		{
+			NTL::ZZ jZZ(j);
+			if ((iZZ * jZZ > 1) && ((iZZ * jZZ) - 1 != number) && (iZZ * jZZ - 1 < number) && (NTL::GCD(number, (iZZ * jZZ) - 1) != 1))
+				result &= false;
+			if ((iZZ - jZZ > 0) && (iZZ-jZZ != number) && (iZZ-jZZ < number) && (NTL::GCD(number, iZZ - jZZ) != 1))
+				result &= false;
+		}
+	}
+	gettimeofday(&end, NULL);
+	if (result == false)
+		return false;
+	std::cout << "Elapsed time (gcd) = " << ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6 << std::endl;
+
+	bool results = true;
+//	for (int i = 1; i <= s + 1; i++)
+//		results[i - 1] = true;
+	NTL::ZZ_p::init(number);
+	NTL::ZZ_pX f(r, 1);
+	f = f - 1;
+	const NTL::ZZ_pXModulus pf(f);
+	NTL::ZZ_pX lhs(1, 1);
+	NTL::ZZ_pX rhs(number % r, 1);
+	gettimeofday(&start, NULL);
+	#pragma omp parallel for reduction(&:results) private(lhs) num_threads(8) schedule(dynamic)
+	for (int a = 1; a <= s + 1; a++)
+	{
+		NTL::ZZ_p::init(number);
+		lhs = NTL::ZZ_pX(1, 1);
+		lhs += a;
+		lhs = NTL::PowerMod(lhs, number, pf);
+		lhs -= a;
+		if (lhs != rhs)
+		{
+			results &= false;
+		}
+	}
+//	for (int a = 1; a <= s + 1; a++)
+//		if (results[a - 1] == false)
+//			return false;
+//	return true;
+	gettimeofday(&end, NULL);
+	std::cout << "Elapsed time (congruence) = " << ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6 << std::endl;
+//	for (int a = 1; a <= s + 1; a++)
+//		if (results[a -1] == false)
+//			return false;
+
+	if (results == false)
+		return false;
+	return true;
+}
+
 int AKS::primitiveModulo()
 {
 //	std::ofstream file;
 	const double r0 = 0.01 * tools.log2(number) * tools.log2(number);
-	std::cout << "r0 = " << r0 << std::endl;
 	NTL::PrimeSeq q;
 	long r = q.next();
 	if (number == 2)
@@ -97,56 +259,6 @@ int AKS::phi(int r)
 		if (NTL::GCD(r, i) == 1)
 			temp++;
 	return temp;
-}
-
-bool AKS::AKSAlgorithm_Bernstein()
-{
-	if (pp.AlgorithmX(number))
-		return false;
-
-	//long r = findRMultiplicativeOrder();
-	int r = primitiveModulo();
-	std::cout << "r = " << r << std::endl;
-//	std::ofstream file;
-//	file.open("test.txt",std::ios::app);
-//	file << "The primitive root modulo of " << number << " is " << r << std::endl;
-//	file.close();
-//	std::cout << "r_temp = " << r_temp << std::endl;
-//	r = r_temp;
-	int phiR = phi(NTL::ZZ(r));
-	const double d = 0.5 * phiR;
-	const double i = 0.475 * phiR;
-	const double j = 0.475 * phiR;
-	//long s = findS(r, d, i, j);
-	long s = findSB(r, d, i, j);
-	std::cout << "s = " << s << std::endl;
-	for (NTL::ZZ i(2); i <= s + 1; i++)
-	{
-		if ((i % number != 0) && (NTL::PowerMod(i % number, number - 1, number) != 1))
-			return false;
-//		if ((i != number) && NTL::GCD(number, i) != 1)
-//			return false;
-		for (NTL::ZZ j(2); j <= s + 1; j++)
-		{
-			if ((i * j > 1) && ((i * j) - 1 != number) && (i * j - 1 < number) && (NTL::GCD(number, (i * j) - 1) != 1))
-				return false;
-			if ((i - j > 0) && (i-j != number) && (i-j < number) && (NTL::GCD(number, i - j) != 1))
-				return false;
-		}
-	}
-
-	NTL::ZZ_p::init(number);
-	NTL::ZZ_pX f(r, 1);
-	f = f - 1;
-	const NTL::ZZ_pXModulus pf(f);
-	NTL::ZZ_pX rhs(number % r, 1);
-	NTL::ZZ_pX lhs(1,1);
-	for (int a = 1; a <= s + 1; a++)
-	{
-		if (!congruence(a, rhs, lhs, pf))
-			return false;
-	}
-	return true;
 }
 
 long AKS::findS(const long r, double d, double i, double j)

@@ -44,7 +44,7 @@ all: AKS
 AKS: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++ -fopenmp -pthread -o "AKS" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -L/usr/local/lib -fopenmp -pthread -o "AKS" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

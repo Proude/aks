@@ -12,6 +12,7 @@
 #include "NTL/vector.h"
 #include <extensions/HelperMacros.h>
 #include "AKS.h"
+#include <sys/time.h>
 
 class PrimalityTests : public CppUnit::TestCase {
 public:

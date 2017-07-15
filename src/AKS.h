@@ -6,12 +6,14 @@
 #include "PerfectPower.h"
 #include "Utilities.h"
 #include <gmp.h>
+#include <sys/time.h>
 
 class AKS {
 public:
 	AKS(NTL::ZZ number);
 	bool AKSAlgorithm();
 	bool AKSAlgorithm_Bernstein();
+	bool AKSAlgorithm_Bernstein_OMP();
 	int phi(NTL::ZZ r);
 	int phi(int r);
 	int primitiveModulo();
