@@ -24,8 +24,8 @@ bool AKS::AKSAlgorithm()
 	int r = findRMultiplicativeOrder();
 	std::cout << r << std::endl;
 
-	for (NTL::ZZ i(2); i < number; i++)
-		if (NTL::GCD(i, number) != 1)
+	for (int i = 2; i < r; i++)
+		if (NTL::GCD(NTL::conv<NTL::ZZ>(i), number) != 1)
 			return false;
 
 	if (r >= number)

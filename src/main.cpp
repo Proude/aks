@@ -1,6 +1,6 @@
 //============================================================================
 // Name        : AKS.cpp
-// Author      : Nathanael Browne
+// Author      : Anastasios Gemtos
 // Version     :
 // Copyright   : University of Bath
 // Description : AKS algorithm in C++
@@ -36,12 +36,12 @@ CPPUNIT_TEST_SUITE_REGISTRATION(PrimalityTests);
 //}
 
 int main() {
-	std::string str("100003");
+	std::string str("2425967623052370772757633156976982469681");
 	NTL::ZZ number(NTL::INIT_VAL, str.c_str());
 	AKS aks(number);
 	struct timeval start, end;
 	gettimeofday(&start, NULL);
-	bool aksv3 = aks.AKSAlgorithm();
+	bool aksv3 = true; //aks.AKSAlgorithm();
 	gettimeofday(&end, NULL);
 	std::cout << ((end.tv_sec  - start.tv_sec) * 1000000u + end.tv_usec - start.tv_usec) / 1.e6 << std::endl;
 	gettimeofday(&start, NULL);
