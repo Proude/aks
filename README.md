@@ -1,4 +1,4 @@
-# Implementation of AKS primality test in single-core, multi-core and many-core architectures
+# (2017) Implementation of AKS primality test in single-core, multi-core and many-core architectures
 
 This project is a part of MSc Dissertation in Software Systems at University of Bath.
 
