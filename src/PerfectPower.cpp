@@ -2,11 +2,17 @@
 
 using namespace NTL;
 
+/*
+ * Constructor
+ */
 PerfectPower::PerfectPower()
 {
 	tools = Utilities();
 }
 
+/*
+ * Algorithm X as proposed by Bernstein (1998)
+ */
 bool PerfectPower::AlgorithmX(ZZ number)
 {
     int f, nroot_b;
@@ -32,6 +38,10 @@ bool PerfectPower::AlgorithmX(ZZ number)
     return false;
 }
 
+/*
+ * Algorithm B as proposed by Bernstein (1998)
+ * Binary search for nth root
+ */
 double PerfectPower::AlgorithmB(int b, RR y, int k)
 {
 	int g = 0;
@@ -67,6 +77,11 @@ double PerfectPower::AlgorithmB(int b, RR y, int k)
 	} while (true);
 }
 
+
+/*
+ * Algorithm N as proposed by Bernstein (1998)
+ * Newton's method for nth root
+ */
 double PerfectPower::AlgorithmN(int b, RR y, int k)
 {
 	int b_prime = ceil(log2(2 * k)) + ceil((b - ceil(log2(2 * k))) / 2);
@@ -85,6 +100,11 @@ double PerfectPower::AlgorithmN(int b, RR y, int k)
 	return r4;
 }
 
+
+/*
+ * Algorithm K as proposed by Bernstein (1998)
+ * Check x^r = n
+ */
 RR PerfectPower::AlgorithmK(ZZ number, long k, RR y)
 {
 	int f = floor(tools.log2(2 * number));

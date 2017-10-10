@@ -16,9 +16,9 @@ PerfectPowerTests::~PerfectPowerTests() {
 	// TODO Auto-generated destructor stub
 }
 
-// supports 65 digit numbers
 void PerfectPowerTests::setUp()
 {
+	// supports 65 digit numbers
 	NTL::ZZ x(100000000000000000);
 	NTL::ZZ y = x;
 	y++;
@@ -34,6 +34,7 @@ void PerfectPowerTests::setUp()
 	}
 }
 
+// Check if the perfect powers from array are true
 void PerfectPowerTests::ReturnTrueIfAllArePerfectPowers()
 {
 	for (auto i = perfectPowers.begin(); i != perfectPowers.end(); i++)
@@ -42,6 +43,7 @@ void PerfectPowerTests::ReturnTrueIfAllArePerfectPowers()
 	}
 }
 
+//Check if the non perfect power number from the array are false
 void PerfectPowerTests::ReturnTrueIfAllAreNotPerfectPowers()
 {
 	for (auto i = notPerfectPowers.begin(); i != notPerfectPowers.end(); i++)
@@ -50,6 +52,7 @@ void PerfectPowerTests::ReturnTrueIfAllAreNotPerfectPowers()
 	}
 }
 
+// Check if the perfect powers from array are true
 void PerfectPowerTests::ReturnTrueIfAllBigNumsArePerfectPowers()
 {
 	for (auto i : bignumPerfectPowers)
@@ -58,6 +61,7 @@ void PerfectPowerTests::ReturnTrueIfAllBigNumsArePerfectPowers()
 	}
 }
 
+//Check if the non perfect power number from the array are false
 void PerfectPowerTests::ReturnFalseIfAllBigNumsAreNotPerfectPowers()
 {
 	for (auto i : bignumNotPerfectPowers)

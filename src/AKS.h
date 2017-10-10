@@ -2,27 +2,33 @@
 #include <NTL/RR.h>
 #include <NTL/ZZXFactoring.h>
 #include <NTL/tools.h>
-#include "LPF.h"
+#include "Combination.h"
 #include "PerfectPower.h"
 #include "Utilities.h"
 #include <gmp.h>
 #include <sys/time.h>
 
+#define N 1024
+
 class AKS {
 public:
 	AKS(NTL::ZZ number);
+	AKS(std::string number);
 	bool AKSAlgorithm();
+	bool AKSAlgorithm_OMP();
 	bool AKSAlgorithm_Bernstein();
 	bool AKSAlgorithm_Bernstein_OMP();
+	bool AKSAlgorithm_Bernstein_CUDA();
 	int phi(NTL::ZZ r);
 	int phi(int r);
 	int primitiveModulo();
 	void setNumber(NTL::ZZ number) { this->number = number; }
 private:
     NTL::ZZ number;
+    int num_arr[N];
     PerfectPower pp;
     Utilities tools;
-    LPF lpf;
+    Comb lpf;
     bool congruence(int a, NTL::ZZ_pX rhs, NTL::ZZ_pX lhs, NTL::ZZ_pXModulus pf);
     int findRBernstein();
     bool isPrimitiveModulo(long r);
